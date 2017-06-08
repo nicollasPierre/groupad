@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -16,11 +17,17 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+
+import br.com.furb.groupad.model.Cliente;
+import br.com.furb.groupad.model.ClientesSingleton;
 
 
 @Path("/arquivo")
 public class ArquivoService {
 
+	private final String repositorio = "C:/temp/";
+	
 	@GET
 	@Produces("text/plain")
 	public String getArquivo() {
@@ -30,9 +37,11 @@ public class ArquivoService {
 	@Path("{id}")
 	@GET
 	@Produces("text/plain")
-	public String getNoticia(@PathParam("id") String id) {
+	public String getNoticia(@Context HttpServletRequest requestContext, @PathParam("id") String id) {
+		ClientesSingleton clientes = ClientesSingleton.getInstance();
+		clientes.addCliente(new Cliente(requestContext.getRemoteAddr()));
 		String conteudo= "";
-		File arquivo = new File("arquivo/"+id);
+		File arquivo = new File(repositorio+id);
 		try (BufferedReader br = new BufferedReader(new FileReader(arquivo))){
 			String auxiliar;
 			while((auxiliar = br.readLine()) != null){
@@ -58,7 +67,7 @@ public class ArquivoService {
 	@Consumes("text/plain")
 	@Produces("text/plain")
 	public String putArquivo(String conteudo, @PathParam("id") String id) {
-		File arquivo = new File("arquivo/"+id);
+		File arquivo = new File(repositorio+id);
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(arquivo))){
 			bw.write(conteudo);
 			bw.close();
@@ -77,7 +86,7 @@ public class ArquivoService {
 	@DELETE
 	@Produces("text/plain")
 	public String deleteArquivo(@PathParam("id") String id) {
-		File arquivo = new File("arquivo/"+id);
+		File arquivo = new File(repositorio+id);
 		try{
 			if(arquivo.delete()){
 				return "Arquivo excluido com sucesso";
