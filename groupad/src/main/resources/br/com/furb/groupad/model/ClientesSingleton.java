@@ -21,6 +21,11 @@ public class ClientesSingleton {
 	}
 	
 	public void addCliente(Cliente cliente){
+		for (Cliente cliente1 : this.clientes) {
+			if(cliente1.getEndereco().equals(cliente.getEndereco())){
+				return;
+			}
+		}
 		clientes.add(cliente);
 	}
 	
@@ -30,6 +35,16 @@ public class ClientesSingleton {
 	
 	public boolean removeCliente(Cliente cliente){
 		return clientes.remove(cliente);
+	}
+	
+	public boolean removeCliente(String endereco){
+		for (Cliente cliente : clientes) {
+			if(cliente.getEndereco().equals(endereco)){
+				return clientes.remove(cliente);
+			}
+		}
+		return false;
+		
 	}
 	
 	public String showClientes(){
